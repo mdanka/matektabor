@@ -2,6 +2,13 @@ from django.db import models
 
 
 
+class Person(models.Model):
+	name = models.CharField(
+		u'N\u00E9v',
+		max_length=200)
+
+
+	
 class Story(models.Model):
 	# A tortenet rovid cime
 	title = models.CharField(
@@ -15,10 +22,3 @@ class Story(models.Model):
 		u'Megold\u00E1s')
 	# Azok, akik mar hallottak korabban
 	people = models.ManyToManyField(Person)
-
-
-
-class Person(models.Model):
-	name = models.CharField(
-		u'N\u00E9v',
-		max_length=200)
