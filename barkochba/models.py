@@ -8,7 +8,7 @@ class Person(models.Model):
 		max_length=200)
 
 
-	
+
 class Story(models.Model):
 	# A tortenet rovid cime
 	title = models.CharField(
@@ -21,4 +21,4 @@ class Story(models.Model):
 	solution = models.TextField(
 		u'Megold\u00E1s')
 	# Azok, akik mar hallottak korabban
-	people = models.ManyToManyField(Person)
+	people = models.ManyToManyField(Person, blank=True)
