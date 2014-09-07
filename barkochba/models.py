@@ -7,6 +7,9 @@ class Person(models.Model):
 		u'N\u00E9v',
 		max_length=200)
 
+	def __unicode__(self):
+		return self.name
+
 
 
 class Story(models.Model):
@@ -22,3 +25,6 @@ class Story(models.Model):
 		u'Megold\u00E1s')
 	# Azok, akik mar hallottak korabban
 	people = models.ManyToManyField(Person, blank=True)
+
+	def __unicode__(self):
+		return self.title
