@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.http import HttpResponse
 
@@ -21,8 +22,10 @@ def person_search(request):
 	normalized_query = normalized_query.replace(u'i', u'(i|\u00ed)')  # i
 	normalized_query = normalized_query.replace(u'o', u'(o|\u00f3|\u00f6|\u0151)')  # o
 	normalized_query = normalized_query.replace(u'u', u'(u|\u00fa|\u00fc|\u0171)')  # u
+
 	person_list = Person.objects.filter(
 		name__iregex=r'' + normalized_query
 	)
-	output = '<br />'.join([p.name for p in person_list])
+	resultJson = [{'id': p.id, 'name': p.name} for p in person_list]
+	output = json.dumps(resultJson)
 	return HttpResponse(output)
