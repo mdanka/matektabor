@@ -1,6 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from barkochba.models import Story
+
 
 def main(request):
-    return HttpResponse("Hello, world. You're at the barkochba main.")
+	story_list = Story.objects.order_by('order_number')
+	context = {'story_list': story_list}
+	output = '<br />'.join([story.title for story in story_list])
+	return render(request, 'barkochba/main.html', context)
