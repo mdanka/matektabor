@@ -1,20 +1,51 @@
 {% load staticfiles %}
 
 <link rel="stylesheet/less" type="text/css" href="{% static 'barkochba/style.less' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'barkochba/lib/jquery.tokeninput-1.6.0/styles/token-input.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'barkochba/lib/jquery.tokeninput-1.6.0/styles/token-input-facebook.css' %}" />
 
 <script src="{% static 'barkochba/lib/jquery-2.1.1.js' %}" type="text/javascript"></script>
 <script src="{% static 'barkochba/lib/jquery.tokeninput-1.6.0/src/jquery.tokeninput.js' %}" type="text/javascript"></script>
 <script src="{% static 'barkochba/lib/less-1.7.5.js' %}" type="text/javascript"></script>
 
-<ul>
-	{% for story in story_list %}
-		<li>{{ story.order_number }} - {{ story.title }}</li>
-	{% endfor %}
-</ul>
+<script type="text/javascript">
+function _namesChanged() {
+	alert($("#names-input").val());
+}
 
-<ul>
-	{% for person in person_list %}
-		<li>{{ person.name }}</li>
-	{% endfor %}
-</ul>
+$(document).ready(function () {
+    $("#names-input").tokenInput("{% url 'barkochba:person_search' %}", {
+    	hintText: 'Keress egy személy nevére',
+    	noResultsText: 'Nincs találat',
+    	searchingText: 'Keresés...',
+    	theme: 'facebook',
+    	preventDuplicates: true,
+    	onAdd: _namesChanged,
+    	onDelete: _namesChanged
+    });
+});
+</script>
+
+<body>
+
+	<div>
+		<ul>
+			{% for story in story_list %}
+				<li>{{ story.order_number }} - {{ story.title }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div>
+		<ul>
+			{% for person in person_list %}
+				<li>{{ person.name }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	<div>
+		<input id="names-input" />
+	</div>
+
+</body>
