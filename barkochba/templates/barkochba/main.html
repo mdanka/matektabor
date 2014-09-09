@@ -1,3 +1,11 @@
+{% load staticfiles %}
+
+<script src="{% static 'lib/jquery/2.1.1/jquery.js' %}"></script>
+<script src="{% static 'lib/jquery.tokeninput/1.6.0/src/jquery.tokeninput.js' %}"></script>
+
+<link rel="stylesheet" type="text/css" href="{% static 'barkochba/style.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'lib/jquery.tokeninput/1.6.0/styles/token-input-facebook.css' %}" />
+
 <ul>
 	{% for story in story_list %}
 		<li>{{ story.order_number }} - {{ story.title }}</li>
