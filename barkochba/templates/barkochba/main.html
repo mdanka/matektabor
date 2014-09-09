@@ -1,10 +1,11 @@
 {% load staticfiles %}
 
-<script src="{% static 'lib/jquery/2.1.1/jquery.js' %}"></script>
-<script src="{% static 'lib/jquery.tokeninput/1.6.0/src/jquery.tokeninput.js' %}"></script>
+<link rel="stylesheet/less" type="text/css" href="{% static 'barkochba/style.less' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'barkochba/lib/jquery.tokeninput-1.6.0/styles/token-input-facebook.css' %}" />
 
-<link rel="stylesheet" type="text/css" href="{% static 'barkochba/style.css' %}" />
-<link rel="stylesheet" type="text/css" href="{% static 'lib/jquery.tokeninput/1.6.0/styles/token-input-facebook.css' %}" />
+<script src="{% static 'barkochba/lib/jquery-2.1.1.js' %}" type="text/javascript"></script>
+<script src="{% static 'barkochba/lib/jquery.tokeninput-1.6.0/src/jquery.tokeninput.js' %}" type="text/javascript"></script>
+<script src="{% static 'barkochba/lib/less-1.7.5.js' %}" type="text/javascript"></script>
 
 <ul>
 	{% for story in story_list %}
