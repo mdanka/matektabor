@@ -13,6 +13,10 @@ class Person(models.Model):
 
 
 class Story(models.Model):
+	# Sorszam a dokumentumban
+	order_number = models.PositiveIntegerField(
+		u'Sorsz\u00E1m',
+		default=0)
 	# A tortenet rovid cime
 	title = models.CharField(
 		u'C\u00EDm',
