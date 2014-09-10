@@ -18,7 +18,7 @@ function _namesChanged() {
 	selectedPersonIds = _.map(selectedPersonIdsString.split(','), function (value) {
 		return Number(value);
 	});
-	$('li.story').each(function() {
+	$('a.barkochba-story').each(function() {
 		storyPersonIds = $(this).data("person-ids");
 		heardStoryPersonIds = _.intersection(selectedPersonIds, storyPersonIds);
 		hasHeardStory = heardStoryPersonIds.length > 0;
@@ -45,16 +45,45 @@ $(document).ready(function () {
 
 <body>
 
-	<div>
-		<input id="names-input" />
-	</div>
+	<div class="container">
 
-	<div>
-		<ul>
-			{% for story_map in stories %}
-				<li class="story" data-person-ids="{{ story_map.person_ids_json }}">{{ story_map.story.order_number }} - {{ story_map.story.title }}</li>
-			{% endfor %}
-		</ul>
+		<div class="row">
+			<div class="col-sm-12">
+				<input id="names-input" />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="list-group">
+					{% for story_map in stories %}
+					  <a href="#" class="list-group-item barkochba-story" data-person-ids="{{ story_map.person_ids_json }}">
+					  	{{ story_map.story.order_number }} - {{ story_map.story.title }}
+					  </a>
+					{% endfor %}
+				</div>
+			</div>
+
+			<div class="col-sm-8">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						4 - Két nyuszi
+					</div>
+					<div class="panel-body">
+					  <p>
+					  	Egy cső fekszik a réten. Az egyik oldalon belenéz az egyik nyuszi, a másikon a másik nyuszi, mégsem látják egymást.
+					  </p>
+					  <p>
+					  	A két nyuszi nem egyszerre nézett bele a csőbe.
+					  </p>
+					  <p>
+					  	Szabó Marcell, Tokovics Dávid
+					  </p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	</div>
 
 </body>
