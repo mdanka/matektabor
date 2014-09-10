@@ -30,16 +30,11 @@ $(document).ready(function () {
 
 	<div>
 		<ul>
-			{% for story in story_list %}
-				<li>{{ story.order_number }} - {{ story.title }}</li>
-			{% endfor %}
-		</ul>
-	</div>
-
-	<div>
-		<ul>
-			{% for person in person_list %}
-				<li>{{ person.name }}</li>
+			{% for story_map in stories %}
+				<li>{{ story_map.story.order_number }} - {{ story_map.story.title }}</li>
+				<div>
+				  {{ story_map.person_ids_json }}
+				</div>
 			{% endfor %}
 		</ul>
 	</div>

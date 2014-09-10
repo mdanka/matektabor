@@ -6,11 +6,17 @@ from barkochba.models import Story, Person
 
 
 def main(request):
-	person_list = Person.objects.all()
 	story_list = Story.objects.order_by('order_number')
+	stories = []
+	for story in story_list:
+		person_ids = story.people.values_list('id', flat=True)
+		person_ids_json = '["' + '", "'.join(str(person_id) for person_id in person_ids) + '"]'
+		story_map = {}
+		story_map['story'] = story
+		story_map['person_ids_json'] = person_ids_json
+		stories.append(story_map)
 	context = {
-		'person_list': person_list,
-		'story_list': story_list
+		'stories': stories
 	}
 	return render(request, 'barkochba/main.html', context)
 
