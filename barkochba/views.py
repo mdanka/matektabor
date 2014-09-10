@@ -10,7 +10,7 @@ def main(request):
 	stories = []
 	for story in story_list:
 		person_ids = story.people.values_list('id', flat=True)
-		person_ids_json = '["' + '", "'.join(str(person_id) for person_id in person_ids) + '"]'
+		person_ids_json = '[' + ', '.join(str(person_id) for person_id in person_ids) + ']'
 		story_map = {}
 		story_map['story'] = story
 		story_map['person_ids_json'] = person_ids_json
