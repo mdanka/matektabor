@@ -18,7 +18,7 @@ function _namesChanged() {
 	selectedPersonIds = _.map(selectedPersonIdsString.split(','), function (value) {
 		return Number(value);
 	});
-	$('a.barkochba-story').each(function() {
+	$('a.barkochba-story-summary').each(function() {
 		storyPersonIds = $(this).data("person-ids");
 		heardStoryPersonIds = _.intersection(selectedPersonIds, storyPersonIds);
 		hasHeardStory = heardStoryPersonIds.length > 0;
@@ -28,6 +28,20 @@ function _namesChanged() {
 			$(this).slideDown();
 		}
 	});
+}
+
+function _storySelected(storyId) {
+	// Select the summary
+	$('a.barkochba-story-summary').removeClass('active');
+	$('a.barkochba-story-summary').filter(function (index) {
+		return $(this).data("story-id") === storyId;
+	}).addClass('active');
+
+	// Show the details
+	$('div.barkochba-story-detail').hide();
+	$('div.barkochba-story-detail').filter(function (index) {
+		return $(this).data("story-id") === storyId;
+	}).show();
 }
 
 $(document).ready(function () {
@@ -57,7 +71,7 @@ $(document).ready(function () {
 			<div class="col-sm-4">
 				<div class="list-group">
 					{% for story_map in stories %}
-					  <a href="#" class="list-group-item barkochba-story" data-person-ids="{{ story_map.person_ids_json }}">
+					  <a href="#" class="list-group-item barkochba-story-summary" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
 					  	{{ story_map.story.order_number }} - {{ story_map.story.title }}
 					  </a>
 					{% endfor %}
@@ -65,22 +79,24 @@ $(document).ready(function () {
 			</div>
 
 			<div class="col-sm-8">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						4 - Két nyuszi
+				{% for story_map in stories %}
+					<div class="panel panel-default barkochba-story-detail" data-story-id="{{ story_map.story.id }}">
+						<div class="panel-heading">
+							{{ story_map.story.order_number }} - {{ story_map.story.title }}
+						</div>
+						<div class="panel-body">
+						  <p>
+						  	{{ story_map.story.story }}
+						  </p>
+						  <p>
+						  	{{ story_map.story.solution }}
+						  </p>
+						  <p>
+						  	Szabó Marcell, Tokovics Dávid
+						  </p>
+						</div>
 					</div>
-					<div class="panel-body">
-					  <p>
-					  	Egy cső fekszik a réten. Az egyik oldalon belenéz az egyik nyuszi, a másikon a másik nyuszi, mégsem látják egymást.
-					  </p>
-					  <p>
-					  	A két nyuszi nem egyszerre nézett bele a csőbe.
-					  </p>
-					  <p>
-					  	Szabó Marcell, Tokovics Dávid
-					  </p>
-					</div>
-				</div>
+				{% endfor %}
 			</div>
 		</div>
 
