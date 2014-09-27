@@ -3,11 +3,14 @@
 <link rel="stylesheet/less" type="text/css" href="{% static 'barkochba/style.less' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery.tokeninput-1.6.0/styles/token-input.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'lib/jquery.tokeninput-1.6.0/styles/token-input-facebook.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'lib/select2-3.5.1/select2.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-3.2.0/css/bootstrap.css' %}" />
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-3.2.0/css/bootstrap-theme.css' %}" />
 
 <script src="{% static 'lib/jquery-2.1.1.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/jquery.tokeninput-1.6.0/src/jquery.tokeninput.js' %}" type="text/javascript"></script>
+<script src="{% static 'lib/select2-3.5.1/select2.js' %}"></script>
+<script src="{% static 'lib/select2-3.5.1/select2_locale_hu.js' %}"></script>
 <script src="{% static 'lib/less-1.7.5.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/underscore-1.7.0.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/bootstrap-3.2.0/js/bootstrap.js' %}" type="text/javascript"></script>
@@ -45,6 +48,7 @@ function _storySelected(storyId) {
 }
 
 $(document).ready(function () {
+	/*
     $("#names-input").tokenInput("{% url 'tabor:person_search' %}", {
     	hintText: 'Keress egy személy nevére',
     	noResultsText: 'Nincs találat',
@@ -54,6 +58,16 @@ $(document).ready(function () {
     	onAdd: _namesChanged,
     	onDelete: _namesChanged
     });
+*/
+	var personJsonData = {{ person_json|safe }};
+
+    $("#names-input").select2({
+    	placeholder: "Keress egy személy nevére",
+    	allowClear: true,
+    	minimumInputLength: 1,
+    	multiple: true,
+    	data:{ results: personJsonData }
+	});
 });
 </script>
 
@@ -64,6 +78,12 @@ $(document).ready(function () {
 		<div class="row">
 			<div class="col-sm-12">
 				<input id="names-input" />
+			</div>
+		</div>
+
+		<div>
+			<div class="col-sm-12">
+				<input type='hidden' id="names-input-2" />
 			</div>
 		</div>
 
