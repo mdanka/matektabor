@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ModelForm
 from tabor.models import Person
 
 
@@ -23,3 +24,8 @@ class Story(models.Model):
 
 	def __unicode__(self):
 		return self.title
+
+class StoryForm(ModelForm):
+	class Meta:
+		model = Story
+		fields = '__all__'

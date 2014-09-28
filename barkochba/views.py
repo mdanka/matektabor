@@ -1,9 +1,9 @@
 import json
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from tabor.models import Person
-from barkochba.models import Story
+from barkochba.models import Story, StoryForm
 
 
 def main(request):
@@ -25,3 +25,17 @@ def main(request):
 		'person_json': all_person_json_string
 	}
 	return render(request, 'barkochba/main.html', context)
+
+
+
+def story_edit(request, story_id):
+	try:
+		story_list = Story.objects.get(id=story_id)
+	except Story.DoesNotExist:
+		raise Http404
+
+	form = StoryForm()
+	context = {
+		'form': form
+	}
+	return render(request, 'barkochba/barkochba-form.html', context)
