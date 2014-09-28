@@ -30,12 +30,22 @@ def main(request):
 
 def story_edit(request, story_id):
 	try:
-		story_list = Story.objects.get(id=story_id)
+		story = Story.objects.get(id=story_id)
 	except Story.DoesNotExist:
 		raise Http404
 
-	form = StoryForm()
+	edit_successful = False
+	if request.method == 'POST':
+		form = StoryForm(request.POST, instance=story)
+		if form.is_valid():
+			form.save()
+			edit_successful = True
+	else:
+		form = StoryForm(instance=story)
+
 	context = {
+		'story_id': story_id,
+		'edit_successful': edit_successful,
 		'form': form
 	}
 	return render(request, 'barkochba/barkochba-form.html', context)

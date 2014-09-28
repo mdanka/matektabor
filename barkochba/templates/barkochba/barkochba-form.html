@@ -1,5 +1,9 @@
-<form action="/your-name/" method="post">
+{% if edit_successful %}
+Success.
+{% else %}
+<form action="{% url 'barkochba:edit' story_id %}" method="post">
     {% csrf_token %}
-    {{ form }}
+    {{ form.as_p }}
     <input type="submit" value="Küldés" />
 </form>
+{% endif %}
