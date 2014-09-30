@@ -6,6 +6,7 @@
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-3.2.0/css/bootstrap-theme.css' %}" />
 
 <script src="{% static 'lib/jquery-2.1.1.js' %}" type="text/javascript"></script>
+<script src="{% static 'lib/jquery.cookie-1.4.1.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/select2-3.5.1/select2.js' %}"></script>
 <script src="{% static 'lib/select2-3.5.1/select2_locale_hu.js' %}"></script>
 <script src="{% static 'lib/less-1.7.5.js' %}" type="text/javascript"></script>
@@ -138,6 +139,29 @@ $(document).ready(function () {
 
 									$("#names-input-{{ story_map.story.id }}").on("change", function() {
 										$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", false);
+									});
+
+									$("#related-people-save-button-{{ story_map.story.id }}").on("click", function() {
+										alert("{% url 'barkochba:update_people' %}");
+										var peopleData = $("#names-input-{{ story_map.story.id }}").select2("data");
+										var csrftoken = $.cookie('csrftoken');
+										var jqxhr = $.ajax({
+											url: "{% url 'barkochba:update_people' %}",
+											type: "POST",
+											data: peopleData,
+											beforeSend: function(xhr, settings) {
+												alert(csrftoken);
+												xhr.setRequestHeader("X-CSRFToken", csrftoken);
+											},
+											success: function() {
+												console.log('A mentés sikerült');
+												$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
+											},
+											error: function(data) {
+												console.log('A mentés nem sikerült');
+												alert('A mentés nem sikerült');
+											}
+										});
 									});
 								</script>
 							</p>

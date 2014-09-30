@@ -30,7 +30,8 @@ def main(request):
 	}
 	return render(request, 'barkochba/main.html', context)
 
-
+def story_update_people(request):
+	return HttpResponse("")
 
 def story_edit(request, story_id):
 	try:
