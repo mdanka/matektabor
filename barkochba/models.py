@@ -25,6 +25,9 @@ class Story(models.Model):
 	def __unicode__(self):
 		return self.title
 
+	def people_sorted(self):
+		return self.people.order_by('name')
+
 class StoryForm(ModelForm):
 	class Meta:
 		model = Story

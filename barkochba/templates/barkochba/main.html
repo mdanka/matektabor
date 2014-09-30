@@ -118,7 +118,7 @@ $(document).ready(function () {
 
 							<p>
 								Akik ismerik:<br />
-								{% for person in story_map.story.people.all %}
+								{% for person in story_map.story.people_sorted %}
 									{{ person }}<br />
 								{% endfor %}
 							</p>
