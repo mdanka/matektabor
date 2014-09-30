@@ -117,7 +117,10 @@ $(document).ready(function () {
 							</div>
 
 							<p>
-								Szabó Marcell, Tokovics Dávid
+								Akik ismerik:<br />
+								{% for person in story_map.story.people.all %}
+									{{ person }}<br />
+								{% endfor %}
 							</p>
 						</div>
 					</div>
