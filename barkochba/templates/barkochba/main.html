@@ -45,7 +45,7 @@ function _storySelected(storyId) {
 }
 
 $(document).ready(function () {
-	var personJsonData = {{ person_json|safe }};
+	var personJsonData = {{ all_people_json|safe }};
 
     $("#names-input").select2({
     	placeholder: "Keress egy személy nevére",

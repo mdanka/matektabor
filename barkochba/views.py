@@ -22,7 +22,7 @@ def main(request):
 		stories.append(story_map)
 	context = {
 		'stories': stories,
-		'person_json': all_person_json_string
+		'all_people_json': all_person_json_string
 	}
 	return render(request, 'barkochba/main.html', context)
 
