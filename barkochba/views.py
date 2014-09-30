@@ -8,7 +8,7 @@ from barkochba.models import Story, StoryForm
 
 def main(request):
 	all_person_list = Person.objects.all()
-	all_person_json = [{'id': int(p.id), 'text': unicode(p.name)} for p in all_person_list]
+	all_person_json = get_select2_json_for_people(all_person_list)
 	all_person_json_string = json.dumps(all_person_json)
 
 	story_list = Story.objects.order_by('order_number')
@@ -16,9 +16,13 @@ def main(request):
 	for story in story_list:
 		person_ids = story.people.values_list('id', flat=True)
 		person_ids_json = '[' + ', '.join(str(person_id) for person_id in person_ids) + ']'
+		related_person_list = story.people.all()
+		related_person_json = get_select2_json_for_people(related_person_list)
+		related_person_json_string = json.dumps(related_person_json)
 		story_map = {}
 		story_map['story'] = story
 		story_map['person_ids_json'] = person_ids_json
+		story_map['related_people_json'] = related_person_json_string
 		stories.append(story_map)
 	context = {
 		'stories': stories,
@@ -49,3 +53,10 @@ def story_edit(request, story_id):
 		'form': form
 	}
 	return render(request, 'barkochba/barkochba-form.html', context)
+
+
+
+
+def get_select2_json_for_people(person_list):
+	person_list_json = [{'id': int(p.id), 'text': unicode(p.name)} for p in person_list]
+	return person_list_json
