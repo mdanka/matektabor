@@ -142,15 +142,13 @@ $(document).ready(function () {
 									});
 
 									$("#related-people-save-button-{{ story_map.story.id }}").on("click", function() {
-										alert("{% url 'barkochba:update_people' %}");
 										var peopleData = $("#names-input-{{ story_map.story.id }}").select2("data");
 										var csrftoken = $.cookie('csrftoken');
 										var jqxhr = $.ajax({
 											url: "{% url 'barkochba:update_people' %}",
 											type: "POST",
-											data: peopleData,
+											data: {storyId: {{ story_map.story.id }}, people: peopleData},
 											beforeSend: function(xhr, settings) {
-												alert(csrftoken);
 												xhr.setRequestHeader("X-CSRFToken", csrftoken);
 											},
 											success: function() {
