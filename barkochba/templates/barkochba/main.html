@@ -143,20 +143,26 @@ $(document).ready(function () {
 
 									$("#related-people-save-button-{{ story_map.story.id }}").on("click", function() {
 										var peopleData = $("#names-input-{{ story_map.story.id }}").select2("data");
+										console.log(peopleData);
+										var personIds = _.map(peopleData, function(person) {return person.id;});
+										console.log(personIds);
 										var csrftoken = $.cookie('csrftoken');
 										var jqxhr = $.ajax({
 											url: "{% url 'barkochba:update_people' %}",
 											type: "POST",
-											data: {storyId: {{ story_map.story.id }}, people: peopleData},
+											data: {'storyId': '{{ story_map.story.id }}', 'people': personIds.toString()},
+											traditional: true,
 											beforeSend: function(xhr, settings) {
 												xhr.setRequestHeader("X-CSRFToken", csrftoken);
 											},
-											success: function() {
+											success: function(data) {
 												console.log('A mentés sikerült');
+												console.log(data);
 												$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
 											},
 											error: function(data) {
 												console.log('A mentés nem sikerült');
+												console.log(data);
 												alert('A mentés nem sikerült');
 											}
 										});

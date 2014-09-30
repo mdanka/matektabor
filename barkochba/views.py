@@ -31,7 +31,17 @@ def main(request):
 	return render(request, 'barkochba/main.html', context)
 
 def story_update_people(request):
-	return HttpResponse("")
+	storyId = request.POST.get('storyId')
+	people = request.POST.get('people')
+	if people == '':
+		personIds = []
+	else:
+		personIds = people.split(',')
+	peopleObjects = Person.objects.filter(pk__in = personIds)
+	story = Story.objects.get(pk = storyId)
+	story.people = peopleObjects
+	story.save()
+	return HttpResponse()
 
 def story_edit(request, story_id):
 	try:
