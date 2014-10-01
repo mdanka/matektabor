@@ -119,6 +119,8 @@ $(document).ready(function () {
 								<button disabled type="button" id="related-people-save-button-{{ story_map.story.id }}" class="btn btn-sm btn-default">
 									<span class="glyphicon glyphicon-pencil"></span> Mentés
 								</button>
+								<div id="save-success-message-{{ story_map.story.id }}" class="alert alert-success" style="display: none;" role="alert">A mentés sikeres volt!</div>
+								<div id="save-error-message-{{ story_map.story.id }}" class="alert alert-danger" style="display: none;" role="alert">A mentés sikertelen</div>
 								<script type="text/javascript">
 									var personJsonData = {{ all_people_json|safe }};
 									var relatedPersonJsonData = {{ story_map.related_people_json|safe }};
@@ -159,11 +161,14 @@ $(document).ready(function () {
 												console.log('A mentés sikerült');
 												console.log(data);
 												$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
+												$("#save-error-message-{{ story_map.story.id }}").slideUp();
+												$("#save-success-message-{{ story_map.story.id }}").slideDown("fast");
 											},
 											error: function(data) {
 												console.log('A mentés nem sikerült');
 												console.log(data);
-												alert('A mentés nem sikerült');
+												$("#save-success-message-{{ story_map.story.id }}").slideUp();
+												$("#save-error-message-{{ story_map.story.id }}").slideDown("fast");
 											}
 										});
 									});
