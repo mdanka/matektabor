@@ -46,5 +46,5 @@ def story_update_people(request):
 
 
 def get_select2_json_for_people(person_list):
-	person_list_json = [{'id': int(p.id), 'text': unicode(p.name)} for p in person_list]
+	person_list_json = [{'id': int(p.id), 'text': unicode(p.get_name_with_camp_group())} for p in person_list]
 	return person_list_json
