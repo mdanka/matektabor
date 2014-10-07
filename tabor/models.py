@@ -11,8 +11,11 @@ class Person(models.Model):
 		blank=True,
 		default='')
 
-	def __unicode__(self):
+	def get_name_with_camp_group(self):
 		if self.camp_group:
 			return self.name + ' (' + self.camp_group + ')'
 		else:
 			return self.name
+
+	def __unicode__(self):
+		return self.get_name_with_camp_group()
