@@ -12,4 +12,7 @@ class Person(models.Model):
 		default='')
 
 	def __unicode__(self):
-		return self.name
+		if self.camp_group:
+			return self.name + ' (' + self.camp_group + ')'
+		else:
+			return self.name
