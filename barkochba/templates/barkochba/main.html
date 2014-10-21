@@ -92,7 +92,7 @@ $(document).ready(function () {
 				{% for story_map in stories %}
 					<div class="panel panel-default barkochba-story-detail" data-story-id="{{ story_map.story.id }}">
 						<div class="panel-heading">
-							{{ story_map.story.order_number }} - {{ story_map.story.title }}
+							{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - 	{% endif %}{{story_map.story.title }}
 						</div>
 						<div class="panel-body">
 							<p>
