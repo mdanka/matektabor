@@ -22,6 +22,10 @@ class Story(models.Model):
 	# Azok, akik mar hallottak korabban
 	people = models.ManyToManyField(Person, blank=True)
 
+	class Meta:
+		verbose_name = u'Barkochbat\u00F6rt\u00E9net'
+		verbose_name_plural = u'Barkochbat\u00F6rt\u00E9net'
+
 	def __unicode__(self):
 		return self.title
 
