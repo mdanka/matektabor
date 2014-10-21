@@ -15,10 +15,12 @@ class Story(models.Model):
 		max_length=200)
 	# Maga a tortenet amit elmondunk
 	story = models.TextField(
-		u'T\u00F6rt\u00E9net')
+		u'T\u00F6rt\u00E9net',
+		default=u'?')
 	# A teljes megoldas
 	solution = models.TextField(
-		u'Megold\u00E1s')
+		u'Megold\u00E1s',
+		default=u'?')
 	# Azok, akik mar hallottak korabban
 	people = models.ManyToManyField(Person, blank=True)
 
