@@ -12,6 +12,7 @@
 <script src="{% static 'lib/less-1.7.5.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/underscore-1.7.0.js' %}" type="text/javascript"></script>
 <script src="{% static 'lib/bootstrap-3.2.0/js/bootstrap.js' %}" type="text/javascript"></script>
+<script src="{% static 'lib/notify.js' %}" type="text/javascript"></script>
 
 <script type="text/javascript">
 function _namesChanged() {
@@ -132,8 +133,6 @@ $(document).ready(function () {
 								<button disabled type="button" id="related-people-save-button-{{ story_map.story.id }}" class="btn btn-sm btn-default">
 									<span class="glyphicon glyphicon-saved"></span> Mentés
 								</button>
-								<div id="save-success-message-{{ story_map.story.id }}" class="alert alert-success" style="display: none;" role="alert">A mentés sikeres volt!</div>
-								<div id="save-error-message-{{ story_map.story.id }}" class="alert alert-danger" style="display: none;" role="alert">A mentés sikertelen</div>
 								<script type="text/javascript">
 									var personJsonData = {{ all_people_json|safe }};
 									var relatedPersonJsonData = {{ story_map.related_people_json|safe }};
@@ -174,14 +173,20 @@ $(document).ready(function () {
 												console.log('A mentés sikerült');
 												console.log(data);
 												$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
-												$("#save-error-message-{{ story_map.story.id }}").slideUp();
-												$("#save-success-message-{{ story_map.story.id }}").slideDown("fast");
+												$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikeres volt!",
+													{
+													  position: 'bottom left',
+													  className: 'success'
+													});
 											},
 											error: function(data) {
 												console.log('A mentés nem sikerült');
 												console.log(data);
-												$("#save-success-message-{{ story_map.story.id }}").slideUp();
-												$("#save-error-message-{{ story_map.story.id }}").slideDown("fast");
+												$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikertelen",
+													{
+													  position: 'bottom left',
+													  className: 'error'
+													});
 											}
 										});
 									});
