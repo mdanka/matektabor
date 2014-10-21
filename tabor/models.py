@@ -11,6 +11,10 @@ class Person(models.Model):
 		blank=True,
 		default='')
 
+	class Meta:
+		verbose_name = u'Szem\u00E9ly'
+		verbose_name_plural = u'Szem\u00E9ly'
+
 	def get_name_with_camp_group(self):
 		if self.camp_group:
 			return self.name + ' (' + self.camp_group + ')'
