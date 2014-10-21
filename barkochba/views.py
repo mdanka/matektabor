@@ -13,6 +13,7 @@ def main(request):
 
 	story_list = Story.objects.order_by('order_number')
 	stories = []
+	storiesWithZeroOrderNumber = []
 	for story in story_list:
 		person_ids = story.people.values_list('id', flat=True)
 		person_ids_json = '[' + ', '.join(str(person_id) for person_id in person_ids) + ']'
@@ -23,7 +24,11 @@ def main(request):
 		story_map['story'] = story
 		story_map['person_ids_json'] = person_ids_json
 		story_map['related_people_json'] = related_person_json_string
-		stories.append(story_map)
+		if story.order_number == 0:
+			storiesWithZeroOrderNumber.append(story_map)
+		else:
+			stories.append(story_map)
+	stories.extend(storiesWithZeroOrderNumber)
 	context = {
 		'stories': stories,
 		'all_people_json': all_person_json_string

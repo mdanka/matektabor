@@ -82,7 +82,7 @@ $(document).ready(function () {
 				<div class="list-group">
 					{% for story_map in stories %}
 						<a href="#" class="list-group-item barkochba-story-summary" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
-							{{ story_map.story.order_number }} - {{ story_map.story.title }}
+							{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - 	{% endif %}{{story_map.story.title }}
 						</a>
 					{% endfor %}
 				</div>
