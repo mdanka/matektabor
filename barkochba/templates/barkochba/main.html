@@ -63,17 +63,22 @@ $(document).ready(function () {
 <body>
 
 	<div class="container">
-		<div>
-			<div class="col-sm-12">
-				<div class="names-input-container">
+		<div class="row name-selection-row">
+			<div class="col-sm-4">
+				<div>
+					<h1>Nekik mesélek:</h1>
 					<p>Keresd ki azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a lista csak azokat a barkochbatörténeteket fogja mutatni, amiket még egyik gyerek sem hallott.</p>
+				</div>
+			</div>
+			<div class="col-sm-8">
+				<div class="names-input-container">
 					<p><input type='hidden' id="names-input" style="width: 100%;" /></p>
 				</div>
 			</div>
 		</div>
 
-		<div class="row">
-			<div class="col-sm-4">
+		<div class="row story-row">
+			<div class="col-sm-4 barkochba-story-list-column">
 				<div class="list-group">
 					{% for story_map in stories %}
 						<a href="#" class="list-group-item barkochba-story-summary" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
@@ -83,7 +88,7 @@ $(document).ready(function () {
 				</div>
 			</div>
 
-			<div class="col-sm-8">
+			<div class="col-sm-8 barkochba-story-detail-column">
 				{% for story_map in stories %}
 					<div class="panel panel-default barkochba-story-detail" data-story-id="{{ story_map.story.id }}">
 						<div class="panel-heading">
