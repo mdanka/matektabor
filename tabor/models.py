@@ -8,7 +8,7 @@ class CampGroup(models.Model):
 
 	class Meta:
 		verbose_name = u'T\u00E1bori csoport'
-		verbose_name_plural = u'T\u00E1bori csoport'
+		verbose_name_plural = u'T\u00E1bori csoportok'
 
 	def __unicode__(self):
 		return self.name
@@ -28,7 +28,7 @@ class Person(models.Model):
 
 	class Meta:
 		verbose_name = u'Szem\u00E9ly'
-		verbose_name_plural = u'Szem\u00E9ly'
+		verbose_name_plural = u'Szem\u00E9lyek'
 
 	def get_name_with_camp_group(self):
 		if self.camp_group:
