@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>{{ camp.get_name }} barkochbatörténet ismeretek</title>
+<style type="text/css">
+p {
+	font-family: "Times New Roman";
+	font-size: 10pt;
+	margin: 0;
+}
+p.story-title {
+	font-family: "Times New Roman";
+	font-size: 12pt;
+	margin: 0;
+}
+p.title {
+	text-align: center;
+	font-family: "Times New Roman";
+	font-size: 14pt;
+	font-weight: normal;
+	margin: 6pt;
+}
+table {
+	table-layout: fixed;
+	width: 100%;
+	border: 1px solid black;
+	border-collapse: collapse;
+}
+td {
+	width: 50%;
+	border: 1px solid black;
+}
+</style>
+</head>
+
+<body>
+<p class="title">{{ camp.get_name }} barkochbatörténet ismeretek</p>
+<table>
+	{% for story_map in stories %}
+		<tr>
+			<td>
+				<p class="story-title">
+					{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - {% endif %}{{ story_map.story.title }}
+				</p>
+				{% if story_map.story.story != '?' %}
+					{{ story_map.story.story|linebreaks}}
+				{% endif %}
+				{% if story_map.story.solution != '?' %}
+					{{ 'M: '|add:story_map.story.solution|linebreaks}}
+				{% endif %}
+			</td>
+			<td>
+				{% for room_map in story_map.rooms %}
+					<p class="room-people">
+						{{ room_map.room }}:
+						{% for person in room_map.people %}{% if forloop.counter0 > 0 %}, {% endif %}{{ person.name }}{% endfor %}
+					</p>
+				{% endfor %}
+			</td>
+		</tr>
+	{% endfor %}
+</table>
+
+</body>
+</html>
+
+
+

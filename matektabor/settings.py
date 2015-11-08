@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'tabor',
     'barkochba',
     'szobabeosztas',
+    'export',
 )
 
 MIDDLEWARE_CLASSES = (

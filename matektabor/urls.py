@@ -9,5 +9,6 @@ urlpatterns = patterns('',
 	url(r'^', include('home.urls', namespace="home")),
 	url(r'^barkochba/', include('barkochba.urls', namespace="barkochba")),
 	url(r'^tabor/', include('tabor.urls', namespace="tabor")),
+	url(r'^export/', include('export.urls', namespace="export")),
 	url(r'^admin/', include(admin.site.urls)),
 )
