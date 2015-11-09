@@ -38,6 +38,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'tabor',
     'barkochba',
+    'szobabeosztas',
+    'export',
 )
 
 MIDDLEWARE_CLASSES = (

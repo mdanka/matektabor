@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-3.2.0/css/bootstrap.css' %}" />
+
+<div class="container">
+	<div class="row">
+		<h3>Tábor választás</h3>
+		<p>Válaszd ki az alábbi listából azt a tábort, aminek a szobabeosztásával szeretnéd generálni a táblázatot a barkochbatörténet ismeretekről. Ha nincs a listában a tábor, az azt jelenti, hogy nincs felvéve hozzá szobabeosztás.</p>
+	</div>
+	<div class="row">
+		<div class="list-group">
+		{% for camp in camp_list %}
+			<a class="list-group-item" href={% url 'export:camp_export' camp.id %}>{{ camp.get_name }}</a>
+		{% endfor %}
+		</div>
+	</div>
+</div>

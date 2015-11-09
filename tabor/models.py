@@ -1,10 +1,25 @@
 from django.db import models
 
+
+class CampGroup(models.Model):
+	name = models.CharField(
+		u'Csoport neve',
+		max_length=200)
+
+	class Meta:
+		verbose_name = u'T\u00E1bori csoport'
+		verbose_name_plural = u'T\u00E1bori csoportok'
+
+	def __unicode__(self):
+		return self.name
+
+
 class Person(models.Model):
 	name = models.CharField(
 		u'N\u00E9v',
 		max_length=200)
 
+	# TODO: ehelyett be kellene vezetni egy (nullable) foreign key-t a CampGroup-ra.
 	camp_group = models.CharField(
 		u'T\u00E1bori csoport',
 		max_length=200,
@@ -13,7 +28,7 @@ class Person(models.Model):
 
 	class Meta:
 		verbose_name = u'Szem\u00E9ly'
-		verbose_name_plural = u'Szem\u00E9ly'
+		verbose_name_plural = u'Szem\u00E9lyek'
 
 	def get_name_with_camp_group(self):
 		if self.camp_group:
