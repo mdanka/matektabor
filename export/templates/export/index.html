@@ -1,3 +1,4 @@
+
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'lib/bootstrap-3.2.0/css/bootstrap.css' %}" />
@@ -11,26 +12,33 @@
 		<p>Válaszd ki az alábbi listából azt a tábort, aminek a szobabeosztásával szeretnéd generálni a táblázatot a barkochbatörténet ismeretekről. Ha nincs a listában a tábor, az azt jelenti, hogy nincs felvéve hozzá szobabeosztás.</p>
 	</div>
 	<div class="row">
-		<div class="list-group">
+		<table class="table">
 		{% for camp in camp_list %}
-			<a class="list-group-item col-sm-4" href="{% url 'export:camp_export' camp.id %}?d=1&amp;s=1">{{ camp.get_name }}</a>
-			<div class="panel panel-default col-sm-8">
-				<div class="panel-heading"><a data-toggle="collapse" href="#form-{{ camp.id }}">Opciók</a></div>
-				<div class="panel-body collapse" id="form-{{ camp.id }}">
-					<form role="form" action="{% url 'export:camp_export' camp.id %}" method="get">
-						<div class="checkbox"><label><input type="checkbox" name="d" value="1" checked>Legyenek benne a történetek leírásai</label></div>
-						<div class="checkbox"><label><input type="checkbox" name="s" value="1" checked>Legyenek benne a megoldások</label></div>
-						<div class="form-group">
-							<label>Csak a következő szobák:</label><label class="checkbox-inline"> </label>
-							{% for room in camp.room_set.all %}
-								<label class="checkbox-inline"><input type="checkbox" name="r" value="{{ room.id }}" checked>{{ room.name }}</label>
-							{% endfor %}
-						</div>
-						<button type="submit" class="btn btn-default">Táblázat generálása</button>
-					</form>
+		<tr>
+			<td class="col-sm-4" style="border: none">
+				<a class="list-group-item" href="{% url 'export:camp_export' camp.id %}?description=1&amp;solution=1">{{ camp.get_name }}</a>
+			</td>
+			<td class="col-sm-8" style="border: none">
+				<div class="panel panel-default">
+					<div class="panel-heading"><a role="button" data-toggle="collapse" href="#form-{{ camp.id }}">Opciók</a></div>
+					<div class="panel-body collapse" id="form-{{ camp.id }}">
+						<form role="form" action="{% url 'export:camp_export' camp.id %}" method="get">
+							<div class="checkbox"><label><input type="checkbox" name="description" value="1" checked>Legyenek benne a történetek leírásai</label></div>
+							<div class="checkbox"><label><input type="checkbox" name="solution" value="1" checked>Legyenek benne a megoldások</label></div>
+							<div class="form-group">
+								Csak a következő szobák:<label class="checkbox-inline"> </label>
+								{% for room in camp.room_set.all %}
+									<label class="checkbox-inline"><input type="checkbox" name="room" value="{{ room.id }}">{{ room.name }}</label>
+								{% endfor %}
+							</div>
+							<button type="submit" class="btn btn-default">Táblázat generálása</button>
+						</form>
+					</div>
 				</div>
-			</div>
+			</td>
+		</tr>
 		{% endfor %}
-		</div>
+		</table>
 	</div>
 </div>
+

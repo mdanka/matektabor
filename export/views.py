@@ -3,6 +3,12 @@ from django.shortcuts import get_object_or_404, render
 from szobabeosztas.models import Camp, Room
 from barkochba.models import Story
 
+def try_parse_int(s, default_val=-1):
+  try:
+    return int(s)
+  except ValueError:
+    return default_val
+
 def index(request):
 	camp_list = Camp.objects.order_by('group__name', 'number')
 	context = {'camp_list': camp_list}
@@ -11,11 +17,11 @@ def index(request):
 def camp_export(request, camp_id):
 	camp = get_object_or_404(Camp, pk=camp_id)
 	rooms = camp.room_set.all()
-	requested_room_ids = [int(s) for s in request.GET.getlist('r')]
+	requested_room_ids = [try_parse_int(s) for s in request.GET.getlist('room')]
 	if requested_room_ids:
 		rooms = camp.room_set.filter(id__in=requested_room_ids)
-	include_descriptions = request.GET.get('d', '0') == '1'
-	include_solutions = request.GET.get('s', '0') == '1'
+	include_descriptions = request.GET.get('description', '0') == '1'
+	include_solutions = request.GET.get('solution', '0') == '1'
 	story_list = Story.objects.order_by('order_number')
 	stories = []
 	storiesWithZeroOrderNumber = []
