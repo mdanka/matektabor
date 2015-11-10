@@ -11,6 +11,11 @@ def index(request):
 def camp_export(request, camp_id):
 	camp = get_object_or_404(Camp, pk=camp_id)
 	rooms = camp.room_set.all()
+	requested_room_ids = [int(s) for s in request.GET.getlist('r')]
+	if requested_room_ids:
+		rooms = camp.room_set.filter(id__in=requested_room_ids)
+	include_descriptions = request.GET.get('d', '0') == '1'
+	include_solutions = request.GET.get('s', '0') == '1'
 	story_list = Story.objects.order_by('order_number')
 	stories = []
 	storiesWithZeroOrderNumber = []
@@ -33,7 +38,12 @@ def camp_export(request, camp_id):
 		else:
 			stories.append(story_map)
 	stories.extend(storiesWithZeroOrderNumber)
-	context = {'stories': stories, 'camp': camp}
+	context = {
+		'stories': stories,
+		'camp': camp,
+		'include_descriptions': include_descriptions,
+		'include_solutions': include_solutions
+	}
 	return render(request, 'export/camp_export.html', context)
 
 

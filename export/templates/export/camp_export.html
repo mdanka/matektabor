@@ -43,10 +43,10 @@ td {
 				<p class="story-title">
 					{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - {% endif %}{{ story_map.story.title }}
 				</p>
-				{% if story_map.story.story != '?' %}
+				{% if include_descriptions and story_map.story.story != '?' %}
 					{{ story_map.story.story|linebreaks}}
 				{% endif %}
-				{% if story_map.story.solution != '?' %}
+				{% if include_solutions and story_map.story.solution != '?' %}
 					{{ 'M: '|add:story_map.story.solution|linebreaks}}
 				{% endif %}
 			</td>
