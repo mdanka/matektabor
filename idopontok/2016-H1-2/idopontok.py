@@ -5,7 +5,7 @@ import operator
 CSV_DELIMITER = ','
 SZOMSZEDOS_HETVEGE_MAX = 1000
 HIANYZOK_EGY_TABORBAN_MAX = 5
-OSSZES_HIANYZO_MAX = 10
+OSSZES_HIANYZO_MAX = 7
 STATUSZ_INTERVALLUM = 1000000
 MENTES_INTERVALLUM = 10000000
 
@@ -39,10 +39,10 @@ tiltott = [
   [],
   [],
   [],
-  [0, 2, 11, 12],
-  [0, 1, 8, 16, 17],
+  [0, 2, 10, 11],
+  [0, 1, 7, 15, 16],
   [1],
-  [0, 1, 12]
+  [0, 1, 11]
 ]
 
 valaszok = []
