@@ -60,6 +60,8 @@ $(document).ready(function () {
 	});
 
 	$("#names-input").on("change", _namesChanged);
+
+	$("#camp-select").select2();
 });
 
 // Saves the people currently in the name selector box as the people
@@ -97,6 +99,15 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			<div class="col-sm-8">
 				<div class="names-input-container">
 					<p><input type='hidden' id="names-input" style="width: 100%;" /></p>
+				</div>
+				<div class="room-select-container">
+					<p>
+						<select id="camp-select" style="width: 30%;">
+							{% for camp_map in camps %}
+								<option value="{{ camp_map.camp.id }}">{{ camp_map.camp_name }}</option>
+							{% endfor %}
+						</select>
+					</p>
 				</div>
 			</div>
 		</div>
