@@ -4,12 +4,22 @@ from django.http import HttpResponse, Http404
 
 from tabor.models import Person
 from barkochba.models import Story, StoryForm
+from szobabeosztas.models import Camp
 
 
 def main(request):
 	all_person_list = Person.objects.all()
 	all_person_json = get_select2_json_for_people(all_person_list)
 	all_person_json_string = json.dumps(all_person_json)
+
+	all_camps = Camp.objects.order_by('group__name', 'number')
+	camps = []
+	for camp in all_camps:
+		camp_map = {}
+		camp_map['camp'] = camp
+		camp_map['camp_name'] = camp.get_name()
+		camps.append(camp_map)
+
 
 	story_list = Story.objects.order_by('order_number')
 	stories = []
@@ -31,7 +41,8 @@ def main(request):
 	stories.extend(storiesWithZeroOrderNumber)
 	context = {
 		'stories': stories,
-		'all_people_json': all_person_json_string
+		'all_people_json': all_person_json_string,
+		'camps': camps
 	}
 	return render(request, 'barkochba/main.html', context)
 
