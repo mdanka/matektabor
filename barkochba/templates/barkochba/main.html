@@ -53,12 +53,12 @@ function _roomChanged(roomselect) {
 		$("#names-input").select2("data", [], true);
 		return;
 	}
-	room_id = Number(roomselect.value)
+	roomId = Number(roomselect.value)
 	room = _.find(roomsJsonData, function(item) {
-		return item.id === room_id;
+		return item.id === roomId;
 	});
 	people = _.filter(personJsonData, function(person) {
-		return  _.contains(room.person_ids, person.id);
+		return _.contains(room.person_ids, person.id);
 	});
 	$("#names-input").select2("data", people, true);
 }
@@ -66,15 +66,105 @@ function _roomChanged(roomselect) {
 function _storySelected(storyId) {
 	// Select the summary
 	$('a.barkochba-story-summary').removeClass('active');
-	$('a.barkochba-story-summary').filter(function (index) {
+	storySummary = $('a.barkochba-story-summary').filter(function (index) {
 		return $(this).data("story-id") === storyId;
-	}).addClass('active');
+	});
+	console.log(storySummary);
+	storySummary.addClass('active');
+	storyPersonIds = storySummary.data("person-ids");
+	
+	_initStoryDetails(storyId, storyPersonIds);
 
 	// Show the details
 	$('div.barkochba-story-detail').hide();
 	$('div.barkochba-story-detail').filter(function (index) {
 		return $(this).data("story-id") === storyId;
 	}).show();
+}
+
+function _initStoryDetails(storyId, storyPersonIds) {
+	relatedPersonJsonData = _.filter(personJsonData, function(person) {
+		return _.contains(storyPersonIds, person.id);
+	});
+
+	var namesInputId = "#names-input-" + storyId;
+    $(namesInputId).select2({
+    	placeholder: "Keress egy személy nevére",
+    	allowClear: true,
+    	minimumInputLength: 1,
+    	multiple: true,
+    	data:{ results: personJsonData }
+	});
+
+    // Prepopulating with the existing people
+	$(namesInputId).select2(
+		"data",
+		relatedPersonJsonData
+	);
+
+	var relatedPeopleSaveButtonId = "#related-people-save-button-" + storyId;
+	$(namesInputId).on("change", function() {
+		$(relatedPeopleSaveButtonId).prop("disabled", false);
+	});
+
+	$(relatedPeopleSaveButtonId).on("click", function() {
+		saveStoryPeople(
+			storyId,
+			function(data) {
+				console.log('A mentés sikerült');
+				console.log(data);
+				$(relatedPeopleSaveButtonId).prop("disabled", true);
+				$(relatedPeopleSaveButtonId).notify("A mentés sikeres volt!",
+					{
+					  position: 'bottom left',
+					  className: 'success'
+					}
+				);
+			},
+			function(data) {
+				console.log('A mentés nem sikerült');
+				console.log(data);
+				$(relatedPeopleSaveButtonId).notify("A mentés sikertelen",
+					{
+					  position: 'bottom left',
+					  className: 'error'
+					}
+				);
+			}
+		);
+	});
+
+	var storyToldButtonId = "#story-told-button-" + storyId;
+	$(storyToldButtonId).on("click", function() {
+		var new_people = $("#names-input").select2("data");
+		var existing_people = $(namesInputId).select2("data");
+		var all_people = _.union(existing_people, new_people);
+		$(namesInputId).select2("data", all_people);
+
+		saveStoryPeople(
+			storyId,
+			function(data) {
+				console.log('A mentés sikerült');
+				console.log(data);
+				$(storyToldButtonId).notify("A mentés sikeres volt!",
+					{
+					  position: 'bottom right',
+					  className: 'success'
+					}
+				);
+			},
+			function(data) {
+				console.log('A mentés nem sikerült');
+				console.log(data);
+				$(storyToldButtonId).notify("A mentés sikertelen",
+					{
+					  position: 'bottom right',
+					  className: 'error'
+					}
+				);
+			}
+		);
+	});
 }
 
 $(document).ready(function () {
@@ -225,86 +315,6 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 							</div>
 						</div>
 					</div>
-
-					<script type="text/javascript">
-						var relatedPersonJsonData = {{ story_map.related_people_json|safe }};
-
-					    $("#names-input-{{ story_map.story.id }}").select2({
-					    	placeholder: "Keress egy személy nevére",
-					    	allowClear: true,
-					    	minimumInputLength: 1,
-					    	multiple: true,
-					    	data:{ results: personJsonData }
-						});
-
-					    // Prepopulating with the existing people
-						$("#names-input-{{ story_map.story.id }}").select2(
-							"data",
-							relatedPersonJsonData
-						);
-
-						$("#names-input-{{ story_map.story.id }}").on("change", function() {
-							$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", false);
-						});
-
-						$("#related-people-save-button-{{ story_map.story.id }}").on("click", function() {
-							saveStoryPeople(
-								"{{ story_map.story.id }}",
-								function(data) {
-									console.log('A mentés sikerült');
-									console.log(data);
-									$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
-									$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikeres volt!",
-										{
-										  position: 'bottom left',
-										  className: 'success'
-										}
-									);
-								},
-								function(data) {
-									console.log('A mentés nem sikerült');
-									console.log(data);
-									$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikertelen",
-										{
-										  position: 'bottom left',
-										  className: 'error'
-										}
-									);
-								}
-							);
-						});
-
-						$("#story-told-button-{{ story_map.story.id }}").on("click", function() {
-							var new_people = $("#names-input").select2("data");
-							var existing_people = $("#names-input-{{ story_map.story.id }}").select2("data");
-							var all_people = _.union(existing_people, new_people);
-							$("#names-input-{{ story_map.story.id }}").select2("data", all_people);
-
-							saveStoryPeople(
-								"{{ story_map.story.id }}",
-								function(data) {
-									console.log('A mentés sikerült');
-									console.log(data);
-									$("#story-told-button-{{ story_map.story.id }}").notify("A mentés sikeres volt!",
-										{
-										  position: 'bottom right',
-										  className: 'success'
-										}
-									);
-								},
-								function(data) {
-									console.log('A mentés nem sikerült');
-									console.log(data);
-									$("#story-told-button-{{ story_map.story.id }}").notify("A mentés sikertelen",
-										{
-										  position: 'bottom right',
-										  className: 'error'
-										}
-									);
-								}
-							);
-						});
-					</script>
 				{% endfor %}
 			</div>
 		</div>
