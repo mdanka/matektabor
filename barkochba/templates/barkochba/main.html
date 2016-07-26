@@ -34,6 +34,34 @@ function _namesChanged() {
 	});
 }
 
+function _campChanged() {
+	selectedCampId = Number($("#camp-select").val());
+	$('div.room-select-container').hide();
+	$('.room-select').select2("data", "", true);
+	$('div.room-select-container').filter(function (index) {
+		return $(this).data("camp-id") === selectedCampId;
+	}).show();
+}
+
+function _roomChanged(evt) {
+	var roomsJsonData = {{ rooms_json|safe }}
+	var personJsonData = {{ all_people_json|safe }};
+	if (evt.val == "") {
+		$("#names-input").select2("data", [], true);
+		return;
+	}
+	room_id = Number(evt.val)
+	room = _.find(roomsJsonData, function(item) {
+		return item.id === room_id;
+	});
+	console.log(room.person_ids);
+	people = _.filter(personJsonData, function(person) {
+		return  _.contains(room.person_ids, person.id);
+	});
+	console.log(people);
+	$("#names-input").select2("data", people, true);
+}
+
 function _storySelected(storyId) {
 	// Select the summary
 	$('a.barkochba-story-summary').removeClass('active');
@@ -61,7 +89,20 @@ $(document).ready(function () {
 
 	$("#names-input").on("change", _namesChanged);
 
-	$("#camp-select").select2();
+	$("#camp-select").select2({
+		placeholder: "Válassz tábort",
+		allowClear: true
+	});
+	$("#camp-select").on("change", _campChanged);
+	$('div.camp-select-container').show();
+
+	$(".room-select").select2({
+		minimumResultsForSearch: Infinity,
+		placeholder: "Válassz szobát",
+		allowClear: true
+	});
+
+	$(".room-select").on("change", _roomChanged);
 });
 
 // Saves the people currently in the name selector box as the people
@@ -96,18 +137,32 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 					<p>Keresd ki azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a lista csak azokat a barkochbatörténeteket fogja mutatni, amiket még egyik gyerek sem hallott.</p>
 				</div>
 			</div>
+			<div class="col-sm-2">
+				<div class="camp-select-container">
+					<select id="camp-select" style="width: 100%;">
+						<option value=""></option>
+						{% for camp_map in camps %}
+							<option value="{{ camp_map.camp.id }}">{{ camp_map.camp_name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="col-sm-2">
+				{% for camp_map in camps %}
+					<div class="room-select-container" data-camp-id="{{ camp_map.camp.id }}">
+						<select class="room-select" id="room-select-{{ camp_map.camp.id }}" style="width: 100%;">
+							<option value=""></option>
+							{% for room in camp_map.rooms %}
+								<option value="{{ room.id }}">{{ room.name }}</option>
+							{% endfor %}
+						</select>							
+					</div>
+				{% endfor %}
+			</div>
+
 			<div class="col-sm-8">
 				<div class="names-input-container">
-					<p><input type='hidden' id="names-input" style="width: 100%;" /></p>
-				</div>
-				<div class="room-select-container">
-					<p>
-						<select id="camp-select" style="width: 30%;">
-							{% for camp_map in camps %}
-								<option value="{{ camp_map.camp.id }}">{{ camp_map.camp_name }}</option>
-							{% endfor %}
-						</select>
-					</p>
+						<p><input type='hidden' id="names-input" style="width: 100%;" /></p>
 				</div>
 			</div>
 		</div>
