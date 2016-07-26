@@ -18,7 +18,7 @@ def main(request):
 		camp_map = {}
 		camp_map['camp'] = camp
 		camp_map['camp_name'] = camp.get_name()
-		camp_map['rooms'] = Room.objects.filter(camp__id=camp.id)
+		camp_map['rooms'] = Room.objects.filter(camp__id=camp.id).order_by('name')
 		camps.append(camp_map)
 
 	all_rooms = Room.objects.all();
