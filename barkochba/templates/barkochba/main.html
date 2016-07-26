@@ -133,11 +133,12 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 		<div class="row name-selection-row">
 			<div class="col-sm-4">
 				<div>
-					<h1>Nekik mesélek:</h1>
-					<p>Keresd ki azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a lista csak azokat a barkochbatörténeteket fogja mutatni, amiket még egyik gyerek sem hallott.</p>
+					<h3>Nekik mesélek:</h3>
+					<p>Válaszd ki a tábort és a szobát, vagy írd be azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a lista csak azokat a barkochbatörténeteket fogja mutatni, amiket még egyik gyerek sem hallott.</p>
+					<p><a href="{% url 'export:index' %}">Áttekintő táblázatok az egyes táborokhoz</a></p>
 				</div>
 			</div>
-			<div class="col-sm-2">
+			<div class="col-sm-3 col-lg-2">
 				<div class="camp-select-container">
 					<select id="camp-select" style="width: 100%;">
 						<option value=""></option>
@@ -147,7 +148,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 					</select>
 				</div>
 			</div>
-			<div class="col-sm-2">
+			<div class="col-sm-3 col-lg-2">
 				{% for camp_map in camps %}
 					<div class="room-select-container" data-camp-id="{{ camp_map.camp.id }}">
 						<select class="room-select" id="room-select-{{ camp_map.camp.id }}" style="width: 100%;">
