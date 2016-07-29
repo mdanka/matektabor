@@ -72,6 +72,7 @@ function _storySelected(storyId) {
 	console.log(storySummary);
 	storySummary.addClass('active');
 	storyPersonIds = storySummary.data("person-ids");
+	console.log(storySummary.data("person-ids"));
 	
 	_initStoryDetails(storyId, storyPersonIds);
 
@@ -86,7 +87,6 @@ function _initStoryDetails(storyId, storyPersonIds) {
 	relatedPersonJsonData = _.filter(personJsonData, function(person) {
 		return _.contains(storyPersonIds, person.id);
 	});
-
 	var namesInputId = "#names-input-" + storyId;
     $(namesInputId).select2({
     	placeholder: "Keress egy személy nevére",
@@ -193,6 +193,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 	console.log(peopleData);
 	var personIds = _.map(peopleData, function(person) {return person.id;});
 	console.log(personIds);
+	$("#story-summary-" + storyId).data("person-ids", personIds);
 	var csrftoken = $.cookie('csrftoken');
 	var jqxhr = $.ajax({
 		url: "{% url 'barkochba:update_people' %}",
@@ -253,7 +254,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			<div class="col-sm-4 barkochba-story-list-column">
 				<div class="list-group">
 					{% for story_map in stories %}
-						<a href="#" class="list-group-item barkochba-story-summary" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
+						<a href="#" class="list-group-item barkochba-story-summary" id="story-summary-{{ story_map.story.id }}" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
 							{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - 	{% endif %}{{story_map.story.title }}
 						</a>
 					{% endfor %}
