@@ -108,30 +108,7 @@ function _initStoryDetails(storyId, storyPersonIds) {
 	});
 
 	$(relatedPeopleSaveButtonId).on("click", function() {
-		saveStoryPeople(
-			storyId,
-			function(data) {
-				console.log('A mentés sikerült');
-				console.log(data);
-				$(relatedPeopleSaveButtonId).prop("disabled", true);
-				$(relatedPeopleSaveButtonId).notify("A mentés sikeres volt!",
-					{
-					  position: 'bottom left',
-					  className: 'success'
-					}
-				);
-			},
-			function(data) {
-				console.log('A mentés nem sikerült');
-				console.log(data);
-				$(relatedPeopleSaveButtonId).notify("A mentés sikertelen",
-					{
-					  position: 'bottom left',
-					  className: 'error'
-					}
-				);
-			}
-		);
+		trySaveStoryPeople(storyId, relatedPeopleSaveButtonId, 'bottom left', true);
 	});
 
 	var storyToldButtonId = "#story-told-button-" + storyId;
@@ -141,29 +118,7 @@ function _initStoryDetails(storyId, storyPersonIds) {
 		var all_people = _.union(existing_people, new_people);
 		$(namesInputId).select2("data", all_people);
 
-		saveStoryPeople(
-			storyId,
-			function(data) {
-				console.log('A mentés sikerült');
-				console.log(data);
-				$(storyToldButtonId).notify("A mentés sikeres volt!",
-					{
-					  position: 'bottom right',
-					  className: 'success'
-					}
-				);
-			},
-			function(data) {
-				console.log('A mentés nem sikerült');
-				console.log(data);
-				$(storyToldButtonId).notify("A mentés sikertelen",
-					{
-					  position: 'bottom right',
-					  className: 'error'
-					}
-				);
-			}
-		);
+		trySaveStoryPeople(storyId, storyToldButtonId, 'bottom right', false);
 	});
 }
 
@@ -185,6 +140,35 @@ $(document).ready(function () {
 		_roomChanged(this);
 	});
 });
+
+function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButton) {
+	saveStoryPeople(
+		storyId,
+		function(data) {
+			console.log('A mentés sikerült');
+			console.log(data);
+			if (disableButton) {
+				$(buttonId).prop("disabled", true);
+			}
+			$(buttonId).notify("A mentés sikeres volt!",
+				{
+				  position: notificationPosition,
+				  className: 'success'
+				}
+			);
+		},
+		function(data) {
+			console.log('A mentés nem sikerült');
+			console.log(data);
+			$(buttonId).notify("A mentés sikertelen",
+				{
+				  position: notificationPosition,
+				  className: 'error'
+				}
+			);
+		}
+	);
+}
 
 // Saves the people currently in the name selector box as the people
 // who heard this Story
