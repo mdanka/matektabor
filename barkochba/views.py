@@ -54,19 +54,36 @@ def main(request):
 	}
 	return render(request, 'barkochba/main.html', context)
 
+
 def story_update_people(request):
 	storyId = request.POST.get('storyId')
-	people = request.POST.get('people')
-	if people == '':
-		personIds = []
-	else:
-		personIds = people.split(',')
-	peopleObjects = Person.objects.filter(pk__in = personIds)
+	addPersonIds = parse_set_of_ints(request.POST.get('addPeople'))
+	removePersonIds = parse_set_of_ints(request.POST.get('removePeople'))
+
 	story = Story.objects.get(pk = storyId)
+	personIds = set([p.id for p in story.people.all()])
+	personIds = personIds - removePersonIds;
+	personIds = personIds | addPersonIds;
+
+	peopleObjects = Person.objects.filter(pk__in = personIds)
 	story.people = peopleObjects
 	story.save()
 	return HttpResponse()
 
+
+def parse_set_of_ints(setString):
+	if setString == '':
+		return set([])
+	intStrings = setString.split(',')
+	intSet = set([])
+	for intString in intStrings:
+		try:
+			parsedInt = int(intString)
+			intSet.add(parsedInt)
+		except ValueError:
+			pass
+			#TODO: Log the parsing error somewhere.
+	return intSet
 
 
 def get_select2_json_for_people(person_list):

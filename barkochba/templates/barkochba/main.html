@@ -69,10 +69,10 @@ function _storySelected(storyId) {
 	storySummary = $('a.barkochba-story-summary').filter(function (index) {
 		return $(this).data("story-id") === storyId;
 	});
-	console.log(storySummary);
+	console.log("selected story:", storySummary);
 	storySummary.addClass('active');
 	storyPersonIds = storySummary.data("person-ids");
-	console.log(storySummary.data("person-ids"));
+	console.log("related people:", storySummary.data("person-ids"));
 	
 	_initStoryDetails(storyId, storyPersonIds);
 
@@ -189,16 +189,26 @@ $(document).ready(function () {
 // Saves the people currently in the name selector box as the people
 // who heard this Story
 function saveStoryPeople(storyId, successFunction, errorFunction) {
+	console.log("Saving people for story:", storyId);
 	var peopleData = $("#names-input-" + storyId).select2("data");
 	console.log(peopleData);
 	var personIds = _.map(peopleData, function(person) {return person.id;});
-	console.log(personIds);
+	console.log("input person ids:", personIds);
+
+	// We always send the total diff compared to the state when the page was loaded.
+	var originalPersonIds = $("#story-summary-" + storyId).data("original-person-ids");
+	console.log("original person ids:", originalPersonIds);
+	var addPersonIds = _.difference(personIds, originalPersonIds);
+	console.log("person ids to add:", addPersonIds);
+	var removePersonIds = _.difference(originalPersonIds, personIds);
+	console.log("person ids to remove:", removePersonIds);
+
 	$("#story-summary-" + storyId).data("person-ids", personIds);
 	var csrftoken = $.cookie('csrftoken');
 	var jqxhr = $.ajax({
 		url: "{% url 'barkochba:update_people' %}",
 		type: "POST",
-		data: {'storyId': storyId.toString(), 'people': personIds.toString()},
+		data: {'storyId': storyId.toString(), 'addPeople': addPersonIds.toString(), 'removePeople': removePersonIds.toString()},
 		traditional: true,
 		beforeSend: function(xhr, settings) {
 			xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -254,7 +264,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			<div class="col-sm-4 barkochba-story-list-column">
 				<div class="list-group">
 					{% for story_map in stories %}
-						<a href="#" class="list-group-item barkochba-story-summary" id="story-summary-{{ story_map.story.id }}" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
+						<a href="#" class="list-group-item barkochba-story-summary" id="story-summary-{{ story_map.story.id }}" data-story-id="{{ story_map.story.id }}" data-person-ids="{{ story_map.person_ids_json }}" data-original-person-ids="{{ story_map.person_ids_json }}" onclick="_storySelected({{ story_map.story.id }});">
 							{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - 	{% endif %}{{story_map.story.title }}
 						</a>
 					{% endfor %}
