@@ -60,13 +60,27 @@ def story_update_people(request):
 	addPersonIds = parse_set_of_ints(request.POST.get('addPeople'))
 	removePersonIds = parse_set_of_ints(request.POST.get('removePeople'))
 
+	# addPersonIds and removePersonIds should be disjoint, but for safety
+	# we exclude elements in their intersection.
+	intersectionIds = addPersonIds & removePersonIds;
+	addPersonIds = addPersonIds - intersectionIds;
+	removePersonIds = removePersonIds - intersectionIds;
+
 	story = Story.objects.get(pk = storyId)
 	personIds = set([p.id for p in story.people.all()])
-	personIds = personIds - removePersonIds;
-	personIds = personIds | addPersonIds;
+	# Only add the missing ones.
+	addPersonIds = addPersonIds - personIds;
+	# Only remove the present ones.
+	removePersonIds = removePersonIds & personIds;
 
-	peopleObjects = Person.objects.filter(pk__in = personIds)
-	story.people = peopleObjects
+	addPeopleObjects = Person.objects.filter(pk__in = addPersonIds)
+	for personObject in addPeopleObjects:
+		story.people.add(personObject);
+
+	removePeopleObjects = Person.objects.filter(pk__in = removePersonIds)
+	for personObject in removePeopleObjects:
+		story.people.remove(personObject);
+
 	story.save()
 	return HttpResponse()
 
