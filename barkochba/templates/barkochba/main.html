@@ -109,7 +109,7 @@ function _initStoryDetails(storyId, storyPersonIds) {
 	});
 
 	$(relatedPeopleSaveButtonId).on("click", function() {
-		trySaveStoryPeople(storyId, relatedPeopleSaveButtonId, 'bottom left', true);
+		saveStoryPeople(storyId, relatedPeopleSaveButtonId, 'bottom left', true);
 	});
 
 	var storyToldButtonId = "#story-told-button-" + storyId;
@@ -119,7 +119,7 @@ function _initStoryDetails(storyId, storyPersonIds) {
 		var all_people = _.union(existing_people, new_people);
 		$(namesInputId).select2("data", all_people);
 
-		trySaveStoryPeople(storyId, storyToldButtonId, 'bottom right', false);
+		saveStoryPeople(storyId, storyToldButtonId, 'bottom right', false);
 	});
 }
 
@@ -163,6 +163,8 @@ function saveAllModifications() {
 			function(data) {
 				console.log('A mentés sikerült');
 				console.log(data);
+				console.log(personIds);
+				$("#story-summary-" + storyId).data("original-person-ids", personIds);
 				$("#success-notification-area").notify("A mentés sikeres volt!",
 				{
 				  position: 'bottom left',
@@ -185,12 +187,37 @@ function saveAllModifications() {
 	});
 }
 
-function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButton) {
-	saveStoryPeople(
+// Saves the people currently in the name selector box as the people
+// who heard this Story
+function saveStoryPeople(storyId, buttonId, notificationPosition, disableButton) {
+	console.log("Saving people for story:", storyId);
+	var peopleData = $("#names-input-" + storyId).select2("data");
+	console.log(peopleData);
+	var personIds = _.map(peopleData, function(person) {return person.id;});
+	console.log("input person ids:", personIds);
+
+	// We always send the total diff compared to the state when the page was loaded.
+	var originalPersonIds = $("#story-summary-" + storyId).data("original-person-ids");
+	console.log("original person ids:", originalPersonIds);
+	var addPersonIds = _.difference(personIds, originalPersonIds);
+	console.log("person ids to add:", addPersonIds);
+	var removePersonIds = _.difference(originalPersonIds, personIds);
+	console.log("person ids to remove:", removePersonIds);
+
+	$("#story-summary-" + storyId).data("person-ids", personIds);
+
+	// Update colors of story summaries.
+	_namesChanged();
+
+	postUpdatePeople(
 		storyId,
+		addPersonIds,
+		removePersonIds,
 		function(data) {
 			console.log('A mentés sikerült');
 			console.log(data);
+			console.log(personIds);
+			$("#story-summary-" + storyId).data("original-person-ids", personIds);
 			if (disableButton) {
 				$(buttonId).prop("disabled", true);
 			}
@@ -213,31 +240,6 @@ function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButt
 			$("#save-all-panel").show("slow");
 		}
 	);
-}
-
-// Saves the people currently in the name selector box as the people
-// who heard this Story
-function saveStoryPeople(storyId, successFunction, errorFunction) {
-	console.log("Saving people for story:", storyId);
-	var peopleData = $("#names-input-" + storyId).select2("data");
-	console.log(peopleData);
-	var personIds = _.map(peopleData, function(person) {return person.id;});
-	console.log("input person ids:", personIds);
-
-	// We always send the total diff compared to the state when the page was loaded.
-	var originalPersonIds = $("#story-summary-" + storyId).data("original-person-ids");
-	console.log("original person ids:", originalPersonIds);
-	var addPersonIds = _.difference(personIds, originalPersonIds);
-	console.log("person ids to add:", addPersonIds);
-	var removePersonIds = _.difference(originalPersonIds, personIds);
-	console.log("person ids to remove:", removePersonIds);
-
-	$("#story-summary-" + storyId).data("person-ids", personIds);
-
-	// Update colors of story summaries.
-	_namesChanged();
-
-	postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction);
 }
 
 function postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction) {
