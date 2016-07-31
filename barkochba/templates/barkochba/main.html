@@ -233,6 +233,10 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 	console.log("person ids to remove:", removePersonIds);
 
 	$("#story-summary-" + storyId).data("person-ids", personIds);
+
+	// Update colors of story summaries.
+	_namesChanged();
+
 	postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction);
 }
 
