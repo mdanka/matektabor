@@ -139,7 +139,50 @@ $(document).ready(function () {
 	$('.room-select').on("change", function() {
 		_roomChanged(this);
 	});
+
+	$("#save-all-button").on("click", saveAllModifications);
 });
+
+function saveAllModifications() {
+	$("#save-all-panel").hide();
+	$('a.barkochba-story-summary').each(function() {
+		var personIds = $(this).data("person-ids");
+		var originalPersonIds = $(this).data("original-person-ids");
+		var addPersonIds = _.difference(personIds, originalPersonIds);
+		var removePersonIds = _.difference(originalPersonIds, personIds);
+
+		if (addPersonIds.length == 0 && removePersonIds.length == 0) {
+			return;
+		}
+		storyId = $(this).data("story-id");
+		postUpdatePeople(
+			storyId,
+			addPersonIds,
+			removePersonIds,
+			function(data) {
+				console.log('A mentés sikerült');
+				console.log(data);
+				$("#success-notification-area").notify("A mentés sikeres volt!",
+				{
+				  position: 'bottom left',
+				  className: 'success'
+				}
+			);
+			},
+			function(data) {
+				console.log('A mentés nem sikerült');
+				console.log(data);
+				$("#save-all-panel").show("slow");
+				$("#save-all-button").notify("A mentés sikertelen!",
+					{
+					  position: 'bottom left',
+					  className: 'error'
+					}
+				);
+			}
+		);
+	});
+}
 
 function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButton) {
 	saveStoryPeople(
@@ -160,12 +203,13 @@ function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButt
 		function(data) {
 			console.log('A mentés nem sikerült');
 			console.log(data);
-			$(buttonId).notify("A mentés sikertelen",
+			$(buttonId).notify("A mentés sikertelen!",
 				{
 				  position: notificationPosition,
 				  className: 'error'
 				}
 			);
+			$("#save-all-panel").show("slow");
 		}
 	);
 }
@@ -188,6 +232,10 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 	console.log("person ids to remove:", removePersonIds);
 
 	$("#story-summary-" + storyId).data("person-ids", personIds);
+	postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction);
+}
+
+function postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction) {
 	var csrftoken = $.cookie('csrftoken');
 	var jqxhr = $.ajax({
 		url: "{% url 'barkochba:update_people' %}",
@@ -256,6 +304,17 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			</div>
 
 			<div class="col-sm-8 barkochba-story-detail-column">
+
+				<div id="success-notification-area"></div>
+				<div class="panel panel-default save-all-notification" id="save-all-panel">
+					<div class="panel-body alert-danger">
+						<p>
+							<strong>Nem mentett módosításaid vannak!</strong> Ezek mentéséhez kattints ide:
+						</p>
+						<button type="button" id="save-all-button" class="btn btn-danger">Összes mentése</button>		
+					</div>
+				</div>
+
 				{% for story_map in stories %}
 					<div class="panel panel-default barkochba-story-detail" data-story-id="{{ story_map.story.id }}">
 						<div class="panel-heading">
