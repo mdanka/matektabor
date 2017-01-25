@@ -23,13 +23,14 @@ function _namesChanged() {
 		return Number(value);
 	});
 	$('a.barkochba-story-summary').each(function() {
+		$(this).removeClass('alert-warning');
+		$(this).removeClass('alert-danger');
 		storyPersonIds = $(this).data("person-ids");
 		heardStoryPersonIds = _.intersection(selectedPersonIds, storyPersonIds);
-		hasHeardStory = heardStoryPersonIds.length > 0;
-		if (hasHeardStory) {
-			$(this).slideUp();
-		} else {
-			$(this).slideDown();
+		if (heardStoryPersonIds.length >= 3) {
+			$(this).addClass('alert-danger');
+		} else if (heardStoryPersonIds.length >= 1) {
+			$(this).addClass('alert-warning');
 		}
 	});
 }
@@ -125,7 +126,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			<div class="col-sm-4">
 				<div>
 					<h3>Nekik mesélek:</h3>
-					<p>Válaszd ki a tábort és a szobát, vagy írd be azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a lista csak azokat a barkochbatörténeteket fogja mutatni, amiket még egyik gyerek sem hallott.</p>
+					<p>Válaszd ki a tábort és a szobát, vagy írd be azon gyerekek neveit, akiknek mesélni szeretnél. Ezután a listában színesek lesznek azok a barkochbatörténetek, amiket valamelyik gyerek már hallotta.</p>
 					<p><a href="{% url 'export:index' %}">Áttekintő táblázatok az egyes táborokhoz</a></p>
 				</div>
 			</div>
