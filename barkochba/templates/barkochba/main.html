@@ -17,6 +17,9 @@
 <script src="{% static 'lib/notify.js' %}" type="text/javascript"></script>
 
 <script type="text/javascript">
+
+var personJsonData = {{ all_people_json|safe }};
+
 function _namesChanged() {
 	selectedPersonIdsString = $("#names-input").val();
 	selectedPersonIds = _.map(selectedPersonIdsString.split(','), function (value) {
@@ -47,17 +50,16 @@ function _campChanged() {
 
 function _roomChanged(roomselect) {
 	var roomsJsonData = {{ rooms_json|safe }}
-	var personJsonData = {{ all_people_json|safe }};
 	if (roomselect.value == "") {
 		$("#names-input").select2("data", [], true);
 		return;
 	}
-	room_id = Number(roomselect.value)
+	roomId = Number(roomselect.value)
 	room = _.find(roomsJsonData, function(item) {
-		return item.id === room_id;
+		return item.id === roomId;
 	});
 	people = _.filter(personJsonData, function(person) {
-		return  _.contains(room.person_ids, person.id);
+		return _.contains(room.person_ids, person.id);
 	});
 	$("#names-input").select2("data", people, true);
 }
@@ -65,9 +67,15 @@ function _roomChanged(roomselect) {
 function _storySelected(storyId) {
 	// Select the summary
 	$('a.barkochba-story-summary').removeClass('active');
-	$('a.barkochba-story-summary').filter(function (index) {
+	storySummary = $('a.barkochba-story-summary').filter(function (index) {
 		return $(this).data("story-id") === storyId;
-	}).addClass('active');
+	});
+	console.log("selected story:", storySummary);
+	storySummary.addClass('active');
+	storyPersonIds = storySummary.data("person-ids");
+	console.log("related people:", storySummary.data("person-ids"));
+	
+	_initStoryDetails(storyId, storyPersonIds);
 
 	// Show the details
 	$('div.barkochba-story-detail').hide();
@@ -76,9 +84,46 @@ function _storySelected(storyId) {
 	}).show();
 }
 
-$(document).ready(function () {
-	var personJsonData = {{ all_people_json|safe }};
+function _initStoryDetails(storyId, storyPersonIds) {
+	relatedPersonJsonData = _.filter(personJsonData, function(person) {
+		return _.contains(storyPersonIds, person.id);
+	});
+	var namesInputId = "#names-input-" + storyId;
+    $(namesInputId).select2({
+    	placeholder: "Keress egy személy nevére",
+    	allowClear: true,
+    	minimumInputLength: 1,
+    	multiple: true,
+    	data:{ results: personJsonData }
+	});
 
+    // Prepopulating with the existing people
+	$(namesInputId).select2(
+		"data",
+		relatedPersonJsonData
+	);
+
+	var relatedPeopleSaveButtonId = "#related-people-save-button-" + storyId;
+	$(namesInputId).on("change", function() {
+		$(relatedPeopleSaveButtonId).prop("disabled", false);
+	});
+
+	$(relatedPeopleSaveButtonId).on("click", function() {
+		trySaveStoryPeople(storyId, relatedPeopleSaveButtonId, 'bottom left', true);
+	});
+
+	var storyToldButtonId = "#story-told-button-" + storyId;
+	$(storyToldButtonId).on("click", function() {
+		var new_people = $("#names-input").select2("data");
+		var existing_people = $(namesInputId).select2("data");
+		var all_people = _.union(existing_people, new_people);
+		$(namesInputId).select2("data", all_people);
+
+		trySaveStoryPeople(storyId, storyToldButtonId, 'bottom right', false);
+	});
+}
+
+$(document).ready(function () {
     $("#names-input").select2({
     	placeholder: "Keress egy személy nevére",
     	allowClear: true,
@@ -95,20 +140,108 @@ $(document).ready(function () {
 	$('.room-select').on("change", function() {
 		_roomChanged(this);
 	});
+
+	$("#save-all-button").on("click", saveAllModifications);
 });
+
+function saveAllModifications() {
+	$("#save-all-panel").hide();
+	$('a.barkochba-story-summary').each(function() {
+		var personIds = $(this).data("person-ids");
+		var originalPersonIds = $(this).data("original-person-ids");
+		var addPersonIds = _.difference(personIds, originalPersonIds);
+		var removePersonIds = _.difference(originalPersonIds, personIds);
+
+		if (addPersonIds.length == 0 && removePersonIds.length == 0) {
+			return;
+		}
+		storyId = $(this).data("story-id");
+		postUpdatePeople(
+			storyId,
+			addPersonIds,
+			removePersonIds,
+			function(data) {
+				console.log('A mentés sikerült');
+				console.log(data);
+				$("#success-notification-area").notify("A mentés sikeres volt!",
+				{
+				  position: 'bottom left',
+				  className: 'success'
+				}
+			);
+			},
+			function(data) {
+				console.log('A mentés nem sikerült');
+				console.log(data);
+				$("#save-all-panel").show("slow");
+				$("#save-all-button").notify("A mentés sikertelen!",
+					{
+					  position: 'bottom left',
+					  className: 'error'
+					}
+				);
+			}
+		);
+	});
+}
+
+function trySaveStoryPeople(storyId, buttonId, notificationPosition, disableButton) {
+	saveStoryPeople(
+		storyId,
+		function(data) {
+			console.log('A mentés sikerült');
+			console.log(data);
+			if (disableButton) {
+				$(buttonId).prop("disabled", true);
+			}
+			$(buttonId).notify("A mentés sikeres volt!",
+				{
+				  position: notificationPosition,
+				  className: 'success'
+				}
+			);
+		},
+		function(data) {
+			console.log('A mentés nem sikerült');
+			console.log(data);
+			$(buttonId).notify("A mentés sikertelen!",
+				{
+				  position: notificationPosition,
+				  className: 'error'
+				}
+			);
+			$("#save-all-panel").show("slow");
+		}
+	);
+}
 
 // Saves the people currently in the name selector box as the people
 // who heard this Story
 function saveStoryPeople(storyId, successFunction, errorFunction) {
+	console.log("Saving people for story:", storyId);
 	var peopleData = $("#names-input-" + storyId).select2("data");
 	console.log(peopleData);
 	var personIds = _.map(peopleData, function(person) {return person.id;});
-	console.log(personIds);
+	console.log("input person ids:", personIds);
+
+	// We always send the total diff compared to the state when the page was loaded.
+	var originalPersonIds = $("#story-summary-" + storyId).data("original-person-ids");
+	console.log("original person ids:", originalPersonIds);
+	var addPersonIds = _.difference(personIds, originalPersonIds);
+	console.log("person ids to add:", addPersonIds);
+	var removePersonIds = _.difference(originalPersonIds, personIds);
+	console.log("person ids to remove:", removePersonIds);
+
+	$("#story-summary-" + storyId).data("person-ids", personIds);
+	postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction);
+}
+
+function postUpdatePeople(storyId, addPersonIds, removePersonIds, successFunction, errorFunction) {
 	var csrftoken = $.cookie('csrftoken');
 	var jqxhr = $.ajax({
 		url: "{% url 'barkochba:update_people' %}",
 		type: "POST",
-		data: {'storyId': storyId.toString(), 'people': personIds.toString()},
+		data: {'storyId': storyId.toString(), 'addPeople': addPersonIds.toString(), 'removePeople': removePersonIds.toString()},
 		traditional: true,
 		beforeSend: function(xhr, settings) {
 			xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -164,7 +297,7 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			<div class="col-sm-4 barkochba-story-list-column">
 				<div class="list-group">
 					{% for story_map in stories %}
-						<a href="#" class="list-group-item barkochba-story-summary" data-person-ids="{{ story_map.person_ids_json }}" data-story-id="{{ story_map.story.id }}" onclick="_storySelected({{ story_map.story.id }});">
+						<a href="#" class="list-group-item barkochba-story-summary" id="story-summary-{{ story_map.story.id }}" data-story-id="{{ story_map.story.id }}" data-person-ids="{{ story_map.person_ids_json }}" data-original-person-ids="{{ story_map.person_ids_json }}" onclick="_storySelected({{ story_map.story.id }});">
 							{% if story_map.story.order_number != 0 %}{{ story_map.story.order_number }} - 	{% endif %}{{story_map.story.title }}
 						</a>
 					{% endfor %}
@@ -172,6 +305,17 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 			</div>
 
 			<div class="col-sm-8 barkochba-story-detail-column">
+
+				<div id="success-notification-area"></div>
+				<div class="panel panel-default save-all-notification" id="save-all-panel">
+					<div class="panel-body alert-danger">
+						<p>
+							<strong>Nem mentett módosításaid vannak!</strong> Ezek mentéséhez kattints ide:
+						</p>
+						<button type="button" id="save-all-button" class="btn btn-danger">Összes mentése</button>		
+					</div>
+				</div>
+
 				{% for story_map in stories %}
 					<div class="panel panel-default barkochba-story-detail" data-story-id="{{ story_map.story.id }}">
 						<div class="panel-heading">
@@ -226,87 +370,6 @@ function saveStoryPeople(storyId, successFunction, errorFunction) {
 							</div>
 						</div>
 					</div>
-
-					<script type="text/javascript">
-						var personJsonData = {{ all_people_json|safe }};
-						var relatedPersonJsonData = {{ story_map.related_people_json|safe }};
-
-					    $("#names-input-{{ story_map.story.id }}").select2({
-					    	placeholder: "Keress egy személy nevére",
-					    	allowClear: true,
-					    	minimumInputLength: 1,
-					    	multiple: true,
-					    	data:{ results: personJsonData }
-						});
-
-					    // Prepopulating with the existing people
-						$("#names-input-{{ story_map.story.id }}").select2(
-							"data",
-							relatedPersonJsonData
-						);
-
-						$("#names-input-{{ story_map.story.id }}").on("change", function() {
-							$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", false);
-						});
-
-						$("#related-people-save-button-{{ story_map.story.id }}").on("click", function() {
-							saveStoryPeople(
-								"{{ story_map.story.id }}",
-								function(data) {
-									console.log('A mentés sikerült');
-									console.log(data);
-									$("#related-people-save-button-{{ story_map.story.id }}").prop("disabled", true);
-									$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikeres volt!",
-										{
-										  position: 'bottom left',
-										  className: 'success'
-										}
-									);
-								},
-								function(data) {
-									console.log('A mentés nem sikerült');
-									console.log(data);
-									$("#related-people-save-button-{{ story_map.story.id }}").notify("A mentés sikertelen",
-										{
-										  position: 'bottom left',
-										  className: 'error'
-										}
-									);
-								}
-							);
-						});
-
-						$("#story-told-button-{{ story_map.story.id }}").on("click", function() {
-							var new_people = $("#names-input").select2("data");
-							var existing_people = $("#names-input-{{ story_map.story.id }}").select2("data");
-							var all_people = _.union(existing_people, new_people);
-							$("#names-input-{{ story_map.story.id }}").select2("data", all_people);
-
-							saveStoryPeople(
-								"{{ story_map.story.id }}",
-								function(data) {
-									console.log('A mentés sikerült');
-									console.log(data);
-									$("#story-told-button-{{ story_map.story.id }}").notify("A mentés sikeres volt!",
-										{
-										  position: 'bottom right',
-										  className: 'success'
-										}
-									);
-								},
-								function(data) {
-									console.log('A mentés nem sikerült');
-									console.log(data);
-									$("#story-told-button-{{ story_map.story.id }}").notify("A mentés sikertelen",
-										{
-										  position: 'bottom right',
-										  className: 'error'
-										}
-									);
-								}
-							);
-						});
-					</script>
 				{% endfor %}
 			</div>
 		</div>

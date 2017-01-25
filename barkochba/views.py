@@ -54,19 +54,50 @@ def main(request):
 	}
 	return render(request, 'barkochba/main.html', context)
 
+
 def story_update_people(request):
 	storyId = request.POST.get('storyId')
-	people = request.POST.get('people')
-	if people == '':
-		personIds = []
-	else:
-		personIds = people.split(',')
-	peopleObjects = Person.objects.filter(pk__in = personIds)
+	addPersonIds = parse_set_of_ints(request.POST.get('addPeople'))
+	removePersonIds = parse_set_of_ints(request.POST.get('removePeople'))
+
+	# addPersonIds and removePersonIds should be disjoint, but for safety
+	# we exclude elements in their intersection.
+	intersectionIds = addPersonIds & removePersonIds;
+	addPersonIds = addPersonIds - intersectionIds;
+	removePersonIds = removePersonIds - intersectionIds;
+
 	story = Story.objects.get(pk = storyId)
-	story.people = peopleObjects
+	personIds = set([p.id for p in story.people.all()])
+	# Only add the missing ones.
+	addPersonIds = addPersonIds - personIds;
+	# Only remove the present ones.
+	removePersonIds = removePersonIds & personIds;
+
+	addPeopleObjects = Person.objects.filter(pk__in = addPersonIds)
+	for personObject in addPeopleObjects:
+		story.people.add(personObject);
+
+	removePeopleObjects = Person.objects.filter(pk__in = removePersonIds)
+	for personObject in removePeopleObjects:
+		story.people.remove(personObject);
+
 	story.save()
 	return HttpResponse()
 
+
+def parse_set_of_ints(setString):
+	if setString == '':
+		return set([])
+	intStrings = setString.split(',')
+	intSet = set([])
+	for intString in intStrings:
+		try:
+			parsedInt = int(intString)
+			intSet.add(parsedInt)
+		except ValueError:
+			pass
+			#TODO: Log the parsing error somewhere.
+	return intSet
 
 
 def get_select2_json_for_people(person_list):
