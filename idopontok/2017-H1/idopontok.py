@@ -6,11 +6,11 @@ import operator
 # Input formatum: https://docs.google.com/spreadsheets/d/1VHSb5TMpmWVqLajR58uWkDm_IRHgKtxUat8jUjt5MJc/edit#gid=941195623
 
 CSV_DELIMITER = ','
-SZOMSZEDOS_HETVEGE_MAX = 20
-HIANYZOK_EGY_TABORBAN_MAX = 20
-OSSZES_HIANYZO_MAX = 20
-STATUSZ_INTERVALLUM = 1000000
-MENTES_INTERVALLUM = 10000000
+SZOMSZEDOS_HETVEGE_MAX = 6
+HIANYZOK_EGY_TABORBAN_MAX = 3
+OSSZES_HIANYZO_MAX = 6
+STATUSZ_INTERVALLUM = 100000000
+MENTES_INTERVALLUM = 1000000000
 
 
 csoport_szam = 0
@@ -45,7 +45,6 @@ with open('input.csv', 'rb') as csvinput:
         for idopont_index in xrange(0, len(row) - 1):
             if row[idopont_index + 1] != '':
                 tiltott[csoport_index].add(idopont_index)
-                print tiltott[csoport_index]
 
 
 # Ahol tul sok hianyzo van, az tiltott hetvege
@@ -78,6 +77,9 @@ for permutation in itertools.permutations(range(0, idopont_szam), csoport_szam):
 
     if counter % MENTES_INTERVALLUM == 0:
         mentes()
+
+    if counter > 10 * MENTES_INTERVALLUM:
+        exit(0)
 
     # Tiltott hetvegek kiszurese
     skip = False
