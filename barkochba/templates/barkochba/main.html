@@ -20,6 +20,11 @@
 
 var personJsonData = {{ all_people_json|safe }};
 
+var exportPeople = {{ export_people|safe }};
+var exportStories = {{ export_stories|safe }};
+var exportCamps = {{ export_camps|safe }};
+var exportRooms = {{ export_rooms|safe }};
+
 function _namesChanged() {
 	selectedPersonIdsString = $("#names-input").val();
 	selectedPersonIds = _.map(selectedPersonIdsString.split(','), function (value) {

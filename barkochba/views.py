@@ -50,7 +50,11 @@ def main(request):
 		'stories': stories,
 		'all_people_json': all_person_json_string,
 		'camps': camps,
-		'rooms_json': rooms_json
+		'rooms_json': rooms_json,
+		'export_people': json.dumps(all_person_list),
+		'export_stories': json.dumps(story_list),
+		'export_camps': json.dumps(all_camps),
+		'export_rooms': json.dumps(all_rooms)
 	}
 	return render(request, 'barkochba/main.html', context)
 
